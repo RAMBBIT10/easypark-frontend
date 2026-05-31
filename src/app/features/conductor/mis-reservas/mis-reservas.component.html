@@ -1,0 +1,57 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header"><h2>📋 Mis reservas</h2></div>
+
+  <div class="alert-success" *ngIf="mensaje">{{ mensaje }}</div>
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  <div class="empty" *ngIf="!loading && reservas.length === 0">No tienes reservas aún.</div>
+
+  <div class="reservas-list">
+    <div class="reserva-card" *ngFor="let r of reservas">
+      <div class="reserva-header">
+        <div>
+          <h3>{{ r.parqueaderoNombre }}</h3>
+          <p>📍 {{ r.parqueaderoDireccion }} – 🏙️ {{ r.parqueaderoMunicipio }}</p>
+          <p>🚗 Placa: <strong>{{ r.placa }}</strong></p>
+        </div>
+        <span class="estado-badge" [ngClass]="getEstadoClass(r.estado)">{{ getEstadoLabel(r.estado) }}</span>
+      </div>
+
+      <div class="reserva-info">
+        <div class="info-item">
+          <span class="label">Inicio</span>
+          <span>{{ r.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-item" *ngIf="r.fechaFin">
+          <span class="label">Fin</span>
+          <span>{{ r.fechaFin | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-item" *ngIf="r.totalAPagar">
+          <span class="label">Total</span>
+          <span class="total">${{ r.totalAPagar }}</span>
+        </div>
+      </div>
+
+      <div class="confirmacion-estado" *ngIf="r.estado === 'PENDIENTE_PAGO'">
+        <span [class.confirmado]="r.conductorConfirmoPago">
+          {{ r.conductorConfirmoPago ? '✅' : '⏳' }} Tú
+        </span>
+        <span [class.confirmado]="r.duenioConfirmoPago">
+          {{ r.duenioConfirmoPago ? '✅' : '⏳' }} Dueño
+        </span>
+      </div>
+
+      <div class="reserva-actions">
+        <button class="btn-finalizar" *ngIf="r.estado === 'EN_CURSO'" (click)="finalizarEstadia(r.id)">
+          🏁 Finalizar estadía
+        </button>
+        <button class="btn-confirm" *ngIf="r.estado === 'PENDIENTE_PAGO' && !r.conductorConfirmoPago" (click)="confirmarPago(r.id)">
+          ✅ Confirmar que pagué
+        </button>
+        <button class="btn-cancel" *ngIf="r.estado === 'EN_CURSO'" (click)="cancelar(r.id)">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

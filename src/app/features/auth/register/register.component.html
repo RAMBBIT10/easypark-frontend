@@ -1,0 +1,73 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">🅿️</div>
+      <h1>Easy Park</h1>
+      <p>Crea tu cuenta</p>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" formControlName="nombre" placeholder="Juan">
+        </div>
+        <div class="form-group">
+          <label>Apellido *</label>
+          <input type="text" formControlName="apellido" placeholder="Pérez">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo de documento *</label>
+          <select formControlName="tipoDocumento">
+            <option *ngFor="let t of tiposDocumento" [value]="t.valor">{{ t.valor }} – {{ t.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Número de documento *</label>
+          <input type="text" formControlName="numeroDocumento" placeholder="1234567890"
+                 [class.error]="form.get('numeroDocumento')?.invalid && form.get('numeroDocumento')?.touched">
+          <span class="error-msg" *ngIf="form.get('numeroDocumento')?.invalid && form.get('numeroDocumento')?.touched">
+            Mínimo 5 caracteres
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Correo electrónico *</label>
+        <input type="email" formControlName="email" placeholder="correo@ejemplo.com"
+               [class.error]="form.get('email')?.invalid && form.get('email')?.touched">
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña *</label>
+        <input type="password" formControlName="password" placeholder="Mínimo 6 caracteres">
+      </div>
+
+      <div class="form-group">
+        <label>Soy...</label>
+        <div class="rol-selector">
+          <div class="rol-option" [class.active]="form.get('rol')?.value === 'CONDUCTOR'"
+               (click)="form.get('rol')?.setValue('CONDUCTOR')">
+            🚗 Conductor
+            <small>Busco parqueadero</small>
+          </div>
+          <div class="rol-option" [class.active]="form.get('rol')?.value === 'DUENO'"
+               (click)="form.get('rol')?.setValue('DUENO')">
+            🏠 Dueño
+            <small>Tengo parqueadero</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-error" *ngIf="error">{{ error }}</div>
+      <button type="submit" class="btn-primary" [disabled]="loading || form.invalid">
+        {{ loading ? 'Registrando...' : 'Crear cuenta' }}
+      </button>
+    </form>
+    <div class="auth-footer">
+      ¿Ya tienes cuenta? <a routerLink="/auth/login">Inicia sesión</a>
+    </div>
+  </div>
+</div>

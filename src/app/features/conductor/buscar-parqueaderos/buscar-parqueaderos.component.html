@@ -1,0 +1,78 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header">
+    <h2>📍 Buscar parqueadero</h2>
+    <div class="header-actions">
+      <input class="search-input" [(ngModel)]="filtroMunicipio" (input)="filtrar()"
+             placeholder="Buscar por municipio o nombre..." [ngModelOptions]="{standalone: true}">
+      <div class="vista-toggle">
+        <button [class.active]="vistaActiva === 'lista'" (click)="mostrarLista()">📋 Lista</button>
+        <button [class.active]="vistaActiva === 'mapa'" (click)="mostrarMapa()">🗺️ Mapa</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">Cargando parqueaderos...</div>
+  <div class="empty" *ngIf="!loading && parqueaderosFiltrados.length === 0">No hay parqueaderos disponibles.</div>
+
+  <!-- Vista lista -->
+  <div class="grid" *ngIf="vistaActiva === 'lista' && !loading">
+    <div class="card" *ngFor="let p of parqueaderosFiltrados" (click)="seleccionar(p)">
+      <div class="card-icon">🅿️</div>
+      <h3>{{ p.nombre }}</h3>
+      <p class="municipio">🏙️ {{ p.municipio }}, {{ p.departamento }}</p>
+      <p class="direccion">📍 {{ p.direccion }}</p>
+      <p class="precio">💰 ${{ p.precioPorHora }}/hora</p>
+      <p class="duenio">👤 {{ p.duenioNombre }}</p>
+      <button class="btn-reservar">Reservar</button>
+    </div>
+  </div>
+
+  <!-- Vista mapa -->
+  <div class="mapa-container" *ngIf="vistaActiva === 'mapa'">
+    <div id="mapa-parqueaderos"></div>
+    <p class="mapa-hint">📍 Haz clic en un marcador para ver el parqueadero y reservarlo</p>
+  </div>
+</div>
+
+<!-- Modal reserva -->
+<div class="modal-overlay" *ngIf="parqueaderoSeleccionado" (click)="cerrarModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Reservar {{ parqueaderoSeleccionado.nombre }}</h3>
+      <button (click)="cerrarModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="parqueadero-info">
+        <p>📍 {{ parqueaderoSeleccionado.direccion }}</p>
+        <p>🏙️ {{ parqueaderoSeleccionado.municipio }}, {{ parqueaderoSeleccionado.departamento }}</p>
+        <p>💰 ${{ parqueaderoSeleccionado.precioPorHora }}/hora</p>
+      </div>
+
+      <div class="info-box">
+        ℹ️ El tiempo empieza desde la fecha de inicio. Cuando termines, presiona <b>"Finalizar estadía"</b> en tus reservas y se calculará el total automáticamente.
+      </div>
+
+      <form [formGroup]="reservaForm" (ngSubmit)="reservar()">
+        <div class="form-group">
+          <label>🚗 Placa del vehículo *</label>
+          <input type="text" formControlName="placa" placeholder="ABC123"
+                 style="text-transform:uppercase"
+                 [class.error]="reservaForm.get('placa')?.invalid && reservaForm.get('placa')?.touched">
+          <span class="error-msg" *ngIf="reservaForm.get('placa')?.invalid && reservaForm.get('placa')?.touched">
+            Formato inválido. Ej: ABC123 o ABC12D
+          </span>
+        </div>
+        <div class="form-group">
+          <label>📅 Fecha y hora de inicio *</label>
+          <input type="datetime-local" formControlName="fechaInicio">
+        </div>
+        <div class="alert-success" *ngIf="mensaje">{{ mensaje }}</div>
+        <div class="alert-error" *ngIf="error">{{ error }}</div>
+        <button type="submit" class="btn-primary" [disabled]="loadingReserva || reservaForm.invalid">
+          {{ loadingReserva ? 'Reservando...' : 'Confirmar reserva' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

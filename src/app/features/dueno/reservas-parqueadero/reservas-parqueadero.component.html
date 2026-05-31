@@ -1,0 +1,31 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header"><h2>📋 Reservas recibidas</h2></div>
+  <div class="alert-success" *ngIf="mensaje">{{ mensaje }}</div>
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  <div class="empty" *ngIf="!loading && reservas.length === 0">No tienes reservas en tus parqueaderos.</div>
+
+  <div class="reservas-list">
+    <div class="reserva-card" *ngFor="let r of reservas">
+      <div class="reserva-header">
+        <div>
+          <h3>{{ r.parqueaderoNombre }}</h3>
+          <p>👤 {{ r.conductorNombre }} – 🚗 <strong>{{ r.placa }}</strong></p>
+        </div>
+        <span class="estado-badge" [ngClass]="getEstadoClass(r.estado)">{{ r.estado }}</span>
+      </div>
+      <div class="reserva-info">
+        <div class="info-item"><span class="label">Inicio</span><span>{{ r.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        <div class="info-item" *ngIf="r.fechaFin"><span class="label">Fin</span><span>{{ r.fechaFin | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        <div class="info-item" *ngIf="r.totalAPagar"><span class="label">Total a cobrar</span><span class="total">${{ r.totalAPagar }}</span></div>
+      </div>
+      <div class="confirmacion-estado" *ngIf="r.estado === 'PENDIENTE_PAGO'">
+        <span [class.confirmado]="r.conductorConfirmoPago">{{ r.conductorConfirmoPago ? '✅' : '⏳' }} Conductor</span>
+        <span [class.confirmado]="r.duenioConfirmoPago">{{ r.duenioConfirmoPago ? '✅' : '⏳' }} Tú</span>
+      </div>
+      <button class="btn-confirm" *ngIf="r.estado === 'PENDIENTE_PAGO' && !r.duenioConfirmoPago" (click)="confirmarPago(r.id)">
+        ✅ Confirmar que recibí el pago de ${{ r.totalAPagar }}
+      </button>
+    </div>
+  </div>
+</div>

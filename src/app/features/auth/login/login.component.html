@@ -1,0 +1,34 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">🅿️</div>
+      <h1>Easy Park</h1>
+      <p>Inicia sesión en tu cuenta</p>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" formControlName="email" placeholder="correo@ejemplo.com"
+               [class.error]="form.get('email')?.invalid && form.get('email')?.touched">
+        <span class="error-msg" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          Ingresa un correo válido
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="••••••"
+               [class.error]="form.get('password')?.invalid && form.get('password')?.touched">
+        <span class="error-msg" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+          La contraseña es requerida
+        </span>
+      </div>
+      <div class="alert-error" *ngIf="error">{{ error }}</div>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Ingresando...' : 'Iniciar sesión' }}
+      </button>
+    </form>
+    <div class="auth-footer">
+      ¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a>
+    </div>
+  </div>
+</div>

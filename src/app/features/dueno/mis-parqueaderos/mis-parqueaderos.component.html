@@ -1,0 +1,81 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header">
+    <h2>🏠 Mis parqueaderos</h2>
+    <button class="btn-add" (click)="showForm = !showForm">
+      {{ showForm ? '✕ Cancelar' : '+ Agregar parqueadero' }}
+    </button>
+  </div>
+
+  <div class="alert-success" *ngIf="mensaje">{{ mensaje }}</div>
+
+  <div class="form-card" *ngIf="showForm">
+    <h3>Nuevo parqueadero</h3>
+    <form [formGroup]="form" (ngSubmit)="crear()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" formControlName="nombre" placeholder="Mi parqueadero">
+        </div>
+        <div class="form-group">
+          <label>Precio por hora (COP) *</label>
+          <input type="number" formControlName="precioPorHora" placeholder="5000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Departamento *</label>
+          <select formControlName="departamento">
+            <option value="">Selecciona...</option>
+            <option *ngFor="let d of departamentos" [value]="d">{{ d }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Municipio *</label>
+          <input type="text" formControlName="municipio" placeholder="Medellín">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Dirección *</label>
+        <div class="direccion-row">
+          <input type="text" formControlName="direccion" placeholder="Calle 10 # 5-20">
+          <button type="button" class="btn-geo" (click)="buscarCoordenadas()" [disabled]="buscandoCoordenadas">
+            {{ buscandoCoordenadas ? '📍 Buscando...' : '📍 Ubicar en mapa' }}
+          </button>
+        </div>
+      </div>
+      <div class="coords-found" *ngIf="form.get('latitud')?.value">
+        ✅ Coordenadas: {{ form.get('latitud')?.value | number:'1.4-4' }}, {{ form.get('longitud')?.value | number:'1.4-4' }}
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text" formControlName="descripcion" placeholder="Espacio techado, seguro...">
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="form.invalid">Crear parqueadero</button>
+    </form>
+  </div>
+
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  <div class="empty" *ngIf="!loading && parqueaderos.length === 0">No tienes parqueaderos. ¡Agrega uno!</div>
+
+  <div class="grid">
+    <div class="card" *ngFor="let p of parqueaderos">
+      <div class="card-header">
+        <h3>{{ p.nombre }}</h3>
+        <span class="estado-badge" [ngClass]="getEstadoClass(p.estado)">{{ p.estado }}</span>
+      </div>
+      <p>📍 {{ p.direccion }}</p>
+      <p>🏙️ {{ p.municipio }}, {{ p.departamento }}</p>
+      <p>💰 ${{ p.precioPorHora }}/hora</p>
+      <p *ngIf="p.latitud">🗺️ En el mapa</p>
+      <p *ngIf="!p.latitud" class="sin-mapa">⚠️ Sin ubicación en mapa</p>
+      <div class="toggle-row" *ngIf="p.estado === 'APROBADO'">
+        <span>Disponible</span>
+        <label class="toggle">
+          <input type="checkbox" [checked]="p.disponible" (change)="toggleDisponibilidad(p)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>

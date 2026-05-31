@@ -1,0 +1,31 @@
+<nav class="navbar" *ngIf="authService.isLoggedIn()">
+  <div class="navbar-brand">
+    <span class="logo">🅿️</span>
+    <span class="brand-name">Easy Park</span>
+  </div>
+
+  <div class="navbar-links">
+    <!-- Conductor -->
+    <ng-container *ngIf="authService.getRol() === 'CONDUCTOR'">
+      <a routerLink="/conductor/parqueaderos" routerLinkActive="active">Buscar parqueadero</a>
+      <a routerLink="/conductor/mis-reservas" routerLinkActive="active">Mis reservas</a>
+    </ng-container>
+
+    <!-- Dueño -->
+    <ng-container *ngIf="authService.getRol() === 'DUENO'">
+      <a routerLink="/dueno/mis-parqueaderos" routerLinkActive="active">Mis parqueaderos</a>
+      <a routerLink="/dueno/reservas" routerLinkActive="active">Reservas recibidas</a>
+    </ng-container>
+
+    <!-- Admin -->
+    <ng-container *ngIf="authService.getRol() === 'ADMINISTRADOR'">
+      <a routerLink="/admin/pendientes" routerLinkActive="active">Pendientes</a>
+      <a routerLink="/admin/reservas" routerLinkActive="active">Todas las reservas</a>
+    </ng-container>
+  </div>
+
+  <div class="navbar-user">
+    <span class="user-name">{{ authService.getCurrentUser()?.nombre }}</span>
+    <button (click)="logout()" class="btn-logout">Cerrar sesión</button>
+  </div>
+</nav>

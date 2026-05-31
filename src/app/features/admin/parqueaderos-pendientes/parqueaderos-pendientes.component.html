@@ -1,0 +1,44 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header"><h2>⏳ Parqueaderos pendientes de aprobación</h2></div>
+  <div class="alert-msg" *ngIf="mensaje">{{ mensaje }}</div>
+  <div class="loading" *ngIf="loading">Cargando...</div>
+  <div class="empty" *ngIf="!loading && parqueaderos.length === 0">No hay parqueaderos pendientes. ✅</div>
+
+  <div class="grid">
+    <div class="card" *ngFor="let p of parqueaderos">
+      <h3>{{ p.nombre }}</h3>
+      <p>📍 {{ p.direccion }}</p>
+      <p>🏙️ {{ p.municipio }}, {{ p.departamento }}</p>
+      <p>💰 ${{ p.precioPorHora }}/hora</p>
+      <p>👤 {{ p.duenioNombre }}</p>
+      <p *ngIf="p.descripcion">📝 {{ p.descripcion }}</p>
+      <div class="acciones">
+        <button class="btn-aprobar" (click)="aprobar(p.id)">✅ Aprobar</button>
+        <button class="btn-rechazar" (click)="abrirModalRechazo(p)">❌ Rechazar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal rechazo -->
+<div class="modal-overlay" *ngIf="parqueaderoArechazar" (click)="cancelarRechazo()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Rechazar "{{ parqueaderoArechazar.nombre }}"</h3>
+      <button (click)="cancelarRechazo()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>¿Estás seguro que deseas rechazar este parqueadero?</p>
+      <div class="form-group">
+        <label>Motivo del rechazo (opcional)</label>
+        <textarea [(ngModel)]="motivoRechazo" rows="3" placeholder="Ej: Documentación incompleta..."></textarea>
+      </div>
+      <p class="aviso">⚠️ El dueño recibirá una notificación con el motivo.</p>
+      <div class="modal-actions">
+        <button class="btn-cancelar" (click)="cancelarRechazo()">Cancelar</button>
+        <button class="btn-rechazar" (click)="confirmarRechazo()">❌ Confirmar rechazo</button>
+      </div>
+    </div>
+  </div>
+</div>
