@@ -7,7 +7,8 @@
              placeholder="Buscar por municipio o nombre..." [ngModelOptions]="{standalone: true}">
       <div class="vista-toggle">
         <button [class.active]="vistaActiva === 'lista'" (click)="mostrarLista()">📋 Lista</button>
-        <button [class.active]="vistaActiva === 'mapa'" (click)="mostrarMapa()">🗺️ Mapa</button>
+        <button [class.active]="vistaActiva === 'mapa'" (click)="mostrarMapa()">🗺️ Mapa general</button>
+        <button [class.active]="vistaActiva === 'ubicacion'" (click)="mostrarUbicacion()" *ngIf="parqueaderoUbicacion">📍 Ver ubicación</button>
       </div>
     </div>
   </div>
@@ -28,10 +29,25 @@
     </div>
   </div>
 
-  <!-- Vista mapa -->
+  <!-- Vista mapa general -->
   <div class="mapa-container" *ngIf="vistaActiva === 'mapa'">
     <div id="mapa-parqueaderos"></div>
     <p class="mapa-hint">📍 Haz clic en un marcador para ver el parqueadero y reservarlo</p>
+  </div>
+
+  <!-- Vista ubicación parqueadero seleccionado -->
+  <div class="mapa-container" *ngIf="vistaActiva === 'ubicacion' && parqueaderoUbicacion">
+    <div class="ubicacion-header">
+      <div>
+        <h3>📍 {{ parqueaderoUbicacion.nombre }}</h3>
+        <p>{{ parqueaderoUbicacion.direccion }}, {{ parqueaderoUbicacion.municipio }}, {{ parqueaderoUbicacion.departamento }}</p>
+      </div>
+      <a [href]="getGoogleMapsUrl(parqueaderoUbicacion)" target="_blank" class="btn-gmaps">
+        🗺️ Abrir en Google Maps
+      </a>
+    </div>
+    <div id="mapa-ubicacion"></div>
+    <p class="mapa-hint" *ngIf="!parqueaderoUbicacion.latitud">⚠️ Este parqueadero no tiene coordenadas exactas. Usa Google Maps para encontrarlo.</p>
   </div>
 </div>
 
@@ -47,6 +63,14 @@
         <p>📍 {{ parqueaderoSeleccionado.direccion }}</p>
         <p>🏙️ {{ parqueaderoSeleccionado.municipio }}, {{ parqueaderoSeleccionado.departamento }}</p>
         <p>💰 ${{ parqueaderoSeleccionado.precioPorHora }}/hora</p>
+        <div class="modal-map-actions">
+          <button class="btn-ver-mapa" (click)="verUbicacionEnMapa(parqueaderoSeleccionado)">
+            📍 Ver en mapa
+          </button>
+          <a [href]="getGoogleMapsUrl(parqueaderoSeleccionado)" target="_blank" class="btn-gmaps-sm">
+            🗺️ Cómo llegar
+          </a>
+        </div>
       </div>
 
       <div class="info-box">

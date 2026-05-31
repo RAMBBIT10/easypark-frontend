@@ -42,8 +42,39 @@
 }
 
 .mapa-container {
-  #mapa-parqueaderos { height: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+  #mapa-parqueaderos, #mapa-ubicacion { height: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
   .mapa-hint { text-align: center; color: #888; font-size: 13px; margin-top: 8px; }
+}
+
+.ubicacion-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
+  h3 { margin: 0; color: #0f3460; font-size: 18px; }
+  p { margin: 4px 0; color: #555; font-size: 13px; }
+}
+
+.btn-gmaps {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 18px; background: #4285F4; color: white;
+  border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none;
+  &:hover { background: #3367d6; }
+}
+
+.modal-map-actions {
+  display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+}
+
+.btn-ver-mapa {
+  padding: 8px 14px; background: #0f3460; color: white; border: none;
+  border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+  &:hover { background: #1a4a8a; }
+}
+
+.btn-gmaps-sm {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 8px 14px; background: #4285F4; color: white;
+  border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;
+  &:hover { background: #3367d6; }
 }
 
 .modal-overlay {

@@ -17,15 +17,17 @@ export class BuscarParqueaderosComponent implements OnInit, AfterViewInit, OnDes
   parqueaderos: ParqueaderoResponse[] = [];
   parqueaderosFiltrados: ParqueaderoResponse[] = [];
   parqueaderoSeleccionado: ParqueaderoResponse | null = null;
+  parqueaderoUbicacion: ParqueaderoResponse | null = null;
   reservaForm: FormGroup;
   filtroMunicipio = '';
   loading = false;
   loadingReserva = false;
   mensaje = '';
   error = '';
-  vistaActiva: 'lista' | 'mapa' = 'lista';
+  vistaActiva: 'lista' | 'mapa' | 'ubicacion' = 'lista';
 
   private map: L.Map | null = null;
+  private mapUbicacion: L.Map | null = null;
   private markers: L.Marker[] = [];
 
   constructor(
@@ -41,7 +43,10 @@ export class BuscarParqueaderosComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnInit(): void { this.cargarParqueaderos(); }
   ngAfterViewInit(): void {}
-  ngOnDestroy(): void { if (this.map) { this.map.remove(); this.map = null; } }
+  ngOnDestroy(): void {
+    if (this.map) { this.map.remove(); this.map = null; }
+    if (this.mapUbicacion) { this.mapUbicacion.remove(); this.mapUbicacion = null; }
+  }
 
   cargarParqueaderos(): void {
     this.loading = true;
@@ -59,7 +64,52 @@ export class BuscarParqueaderosComponent implements OnInit, AfterViewInit, OnDes
   }
 
   mostrarMapa(): void { this.vistaActiva = 'mapa'; setTimeout(() => this.inicializarMapa(), 100); }
-  mostrarLista(): void { this.vistaActiva = 'lista'; if (this.map) { this.map.remove(); this.map = null; } }
+  mostrarLista(): void {
+    this.vistaActiva = 'lista';
+    if (this.map) { this.map.remove(); this.map = null; }
+    if (this.mapUbicacion) { this.mapUbicacion.remove(); this.mapUbicacion = null; }
+  }
+
+  mostrarUbicacion(): void {
+    this.vistaActiva = 'ubicacion';
+    setTimeout(() => this.inicializarMapaUbicacion(), 100);
+  }
+
+  verUbicacionEnMapa(p: ParqueaderoResponse): void {
+    this.parqueaderoUbicacion = p;
+    this.cerrarModal();
+    this.mostrarUbicacion();
+  }
+
+  getGoogleMapsUrl(p: ParqueaderoResponse): string {
+    if (p.latitud && p.longitud) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${p.latitud},${p.longitud}`;
+    }
+    const query = encodeURIComponent(`${p.direccion}, ${p.municipio}, ${p.departamento}, Colombia`);
+    return `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }
+
+  private inicializarMapaUbicacion(): void {
+    if (this.mapUbicacion) { this.mapUbicacion.remove(); }
+    const p = this.parqueaderoUbicacion;
+    if (!p) return;
+    const lat = p.latitud || 4.711;
+    const lng = p.longitud || -74.0721;
+    const zoom = p.latitud ? 16 : 6;
+    this.mapUbicacion = L.map('mapa-ubicacion').setView([lat, lng], zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(this.mapUbicacion);
+    if (p.latitud && p.longitud) {
+      L.marker([p.latitud, p.longitud])
+        .bindPopup(`<b>🅿️ ${p.nombre}</b><br>📍 ${p.direccion}<br>🏙️ ${p.municipio}`)
+        .addTo(this.mapUbicacion).openPopup();
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        L.circle([pos.coords.latitude, pos.coords.longitude], { color: '#0f3460', radius: 100 })
+          .bindPopup('📍 Tu ubicación actual').addTo(this.mapUbicacion!);
+      }, () => {});
+    }
+  }
 
   private inicializarMapa(): void {
     if (this.map) { this.map.remove(); }
