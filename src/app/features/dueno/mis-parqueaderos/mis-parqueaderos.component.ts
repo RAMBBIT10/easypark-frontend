@@ -63,20 +63,61 @@ export class MisParqueaderosComponent implements OnInit {
     const departamento = this.form.get('departamento')?.value;
     if (!direccion || !municipio) return;
     this.buscandoCoordenadas = true;
-    const query = `${direccion}, ${municipio}, ${departamento}, Colombia`;
+
+    const normalizada = this.normalizarDireccion(direccion);
+    const query = `${normalizada}, ${municipio}, ${departamento}, Colombia`;
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+
     this.http.get<any[]>(url).subscribe({
       next: (results) => {
-        this.buscandoCoordenadas = false;
         if (results && results.length > 0) {
           this.form.patchValue({ latitud: parseFloat(results[0].lat), longitud: parseFloat(results[0].lon) });
           this.mensaje = '📍 Ubicación encontrada en el mapa';
+          this.buscandoCoordenadas = false;
         } else {
-          this.mensaje = '⚠️ No se encontró la ubicación exacta.';
+          // Segundo intento solo con municipio
+          const url2 = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(municipio + ', ' + departamento + ', Colombia')}&format=json&limit=1`;
+          this.http.get<any[]>(url2).subscribe({
+            next: (r2) => {
+              this.buscandoCoordenadas = false;
+              if (r2 && r2.length > 0) {
+                this.form.patchValue({ latitud: parseFloat(r2[0].lat), longitud: parseFloat(r2[0].lon) });
+                this.mensaje = '📍 Ubicación aproximada al municipio (dirección exacta no encontrada)';
+              } else {
+                this.mensaje = '⚠️ No se pudo obtener la ubicación.';
+              }
+            },
+            error: () => { this.buscandoCoordenadas = false; this.mensaje = '⚠️ Error al buscar ubicación.'; }
+          });
         }
       },
-      error: () => { this.buscandoCoordenadas = false; this.mensaje = '⚠️ No se pudo obtener la ubicación.'; }
+      error: () => { this.buscandoCoordenadas = false; this.mensaje = '⚠️ Error al buscar ubicación.'; }
     });
+  }
+
+  private normalizarDireccion(dir: string): string {
+    return dir
+      .toLowerCase()
+      .replace(/\bkra\b/g, 'Carrera')
+      .replace(/\bcr\b/g, 'Carrera')
+      .replace(/\bcra\b/g, 'Carrera')
+      .replace(/\bcarr\b/g, 'Carrera')
+      .replace(/\bk\b/g, 'Carrera')
+      .replace(/\bcll\b/g, 'Calle')
+      .replace(/\bcl\b/g, 'Calle')
+      .replace(/\bclle\b/g, 'Calle')
+      .replace(/\bav\b/g, 'Avenida')
+      .replace(/\bave\b/g, 'Avenida')
+      .replace(/\bdg\b/g, 'Diagonal')
+      .replace(/\bdiag\b/g, 'Diagonal')
+      .replace(/\btv\b/g, 'Transversal')
+      .replace(/\btr\b/g, 'Transversal')
+      .replace(/\btrans\b/g, 'Transversal')
+      .replace(/\bcir\b/g, 'Circular')
+      .replace(/\bac\b/g, 'Autopista')
+      .replace(/#/g, 'No.')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   crear(): void {
