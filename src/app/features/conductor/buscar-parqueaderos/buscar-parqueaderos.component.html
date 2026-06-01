@@ -7,8 +7,7 @@
              placeholder="Buscar por municipio o nombre..." [ngModelOptions]="{standalone: true}">
       <div class="vista-toggle">
         <button [class.active]="vistaActiva === 'lista'" (click)="mostrarLista()">📋 Lista</button>
-        <button [class.active]="vistaActiva === 'mapa'" (click)="mostrarMapa()">🗺️ Mapa general</button>
-        <button [class.active]="vistaActiva === 'ubicacion'" (click)="mostrarUbicacion()" *ngIf="parqueaderoUbicacion">📍 Ver ubicación</button>
+        <button [class.active]="vistaActiva === 'mapa'" (click)="mostrarMapa()">🗺️ Mapa</button>
       </div>
     </div>
   </div>
@@ -16,7 +15,6 @@
   <div class="loading" *ngIf="loading">Cargando parqueaderos...</div>
   <div class="empty" *ngIf="!loading && parqueaderosFiltrados.length === 0">No hay parqueaderos disponibles.</div>
 
-  <!-- Vista lista -->
   <div class="grid" *ngIf="vistaActiva === 'lista' && !loading">
     <div class="card" *ngFor="let p of parqueaderosFiltrados" (click)="seleccionar(p)">
       <div class="card-icon">🅿️</div>
@@ -29,29 +27,12 @@
     </div>
   </div>
 
-  <!-- Vista mapa general -->
   <div class="mapa-container" *ngIf="vistaActiva === 'mapa'">
     <div id="mapa-parqueaderos"></div>
     <p class="mapa-hint">📍 Haz clic en un marcador para ver el parqueadero y reservarlo</p>
   </div>
-
-  <!-- Vista ubicación parqueadero seleccionado -->
-  <div class="mapa-container" *ngIf="vistaActiva === 'ubicacion' && parqueaderoUbicacion">
-    <div class="ubicacion-header">
-      <div>
-        <h3>📍 {{ parqueaderoUbicacion.nombre }}</h3>
-        <p>{{ parqueaderoUbicacion.direccion }}, {{ parqueaderoUbicacion.municipio }}, {{ parqueaderoUbicacion.departamento }}</p>
-      </div>
-      <a [href]="getGoogleMapsUrl(parqueaderoUbicacion)" target="_blank" class="btn-gmaps">
-        🗺️ Abrir en Google Maps
-      </a>
-    </div>
-    <div id="mapa-ubicacion"></div>
-    <p class="mapa-hint" *ngIf="!parqueaderoUbicacion.latitud">⚠️ Este parqueadero no tiene coordenadas exactas. Usa Google Maps para encontrarlo.</p>
-  </div>
 </div>
 
-<!-- Modal reserva -->
 <div class="modal-overlay" *ngIf="parqueaderoSeleccionado" (click)="cerrarModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -63,20 +44,13 @@
         <p>📍 {{ parqueaderoSeleccionado.direccion }}</p>
         <p>🏙️ {{ parqueaderoSeleccionado.municipio }}, {{ parqueaderoSeleccionado.departamento }}</p>
         <p>💰 ${{ parqueaderoSeleccionado.precioPorHora }}/hora</p>
-        <div class="modal-map-actions">
-          <button class="btn-ver-mapa" (click)="verUbicacionEnMapa(parqueaderoSeleccionado)">
-            📍 Ver en mapa
-          </button>
-          <a [href]="getGoogleMapsUrl(parqueaderoSeleccionado)" target="_blank" class="btn-gmaps-sm">
-            🗺️ Cómo llegar
-          </a>
-        </div>
+        <a [href]="getGoogleMapsUrl(parqueaderoSeleccionado)" target="_blank" class="btn-gmaps-sm">
+          🗺️ Cómo llegar
+        </a>
       </div>
-
       <div class="info-box">
         ℹ️ El tiempo empieza desde la fecha de inicio. Cuando termines, presiona <b>"Finalizar estadía"</b> en tus reservas y se calculará el total automáticamente.
       </div>
-
       <form [formGroup]="reservaForm" (ngSubmit)="reservar()">
         <div class="form-group">
           <label>🚗 Placa del vehículo *</label>

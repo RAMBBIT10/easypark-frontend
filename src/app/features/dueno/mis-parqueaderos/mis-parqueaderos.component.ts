@@ -1,18 +1,17 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ParqueaderoService } from '../../../core/services/api.service';
 import { ParqueaderoResponse } from '../../../core/models/models';
-import * as L from 'leaflet';
 
 export const DEPARTAMENTOS_COLOMBIA = [
-  'Amazonas','Antioquia','Arauca','Atlántico','Bolívar','Boyacá','Caldas','Caquetá',
-  'Casanare','Cauca','Cesar','Chocó','Córdoba','Cundinamarca','Guainía','Guaviare',
-  'Huila','La Guajira','Magdalena','Meta','Nariño','Norte de Santander','Putumayo',
-  'Quindío','Risaralda','San Andrés','Santander','Sucre','Tolima','Valle del Cauca',
-  'Vaupés','Vichada'
+  'Amazonas','Antioquia','Arauca','Atlantico','Bolivar','Boyaca','Caldas','Caqueta',
+  'Casanare','Cauca','Cesar','Choco','Cordoba','Cundinamarca','Guainia','Guaviare',
+  'Huila','La Guajira','Magdalena','Meta','Narino','Norte de Santander','Putumayo',
+  'Quindio','Risaralda','San Andres','Santander','Sucre','Tolima','Valle del Cauca',
+  'Vaupes','Vichada'
 ];
 
 @Component({
@@ -22,17 +21,15 @@ export const DEPARTAMENTOS_COLOMBIA = [
   templateUrl: './mis-parqueaderos.component.html',
   styleUrls: ['./mis-parqueaderos.component.scss']
 })
-export class MisParqueaderosComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MisParqueaderosComponent implements OnInit {
   parqueaderos: ParqueaderoResponse[] = [];
   loading = false;
   showForm = false;
   mensaje = '';
+  mensajeUbicacion = '';
   buscandoCoordenadas = false;
   form: FormGroup;
   departamentos = DEPARTAMENTOS_COLOMBIA;
-
-  private mapaForm: L.Map | null = null;
-  private marcador: L.Marker | null = null;
 
   constructor(
     private parqueaderoService: ParqueaderoService,
@@ -52,65 +49,59 @@ export class MisParqueaderosComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   ngOnInit(): void { this.cargar(); }
-  ngAfterViewInit(): void {}
-  ngOnDestroy(): void { this.destruirMapa(); }
 
   toggleForm(): void {
     this.showForm = !this.showForm;
-    if (this.showForm) {
-      setTimeout(() => this.inicializarMapaForm(), 200);
-    } else {
-      this.destruirMapa();
-      this.form.reset();
-    }
+    if (!this.showForm) { this.form.reset(); this.mensajeUbicacion = ''; }
   }
 
-  private inicializarMapaForm(): void {
-    this.destruirMapa();
-    this.mapaForm = L.map('mapa-form').setView([4.711, -74.0721], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(this.mapaForm);
-
-    this.mapaForm.on('click', (e: L.LeafletMouseEvent) => {
-      const lat = e.latlng.lat;
-      const lng = e.latlng.lng;
-      this.form.patchValue({ latitud: lat, longitud: lng });
-
-      if (this.marcador) {
-        this.marcador.setLatLng([lat, lng]);
-      } else {
-        this.marcador = L.marker([lat, lng], {
-          icon: L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-            iconSize: [25, 41], iconAnchor: [12, 41]
-          })
-        }).addTo(this.mapaForm!).bindPopup('🅿️ Mi parqueadero').openPopup();
-      }
-    });
-  }
-
-  private destruirMapa(): void {
-    if (this.mapaForm) { this.mapaForm.remove(); this.mapaForm = null; }
-    this.marcador = null;
-  }
-
-  centrarMapaEnMunicipio(): void {
+  buscarUbicacion(): void {
+    const direccion = this.form.get('direccion')?.value;
     const municipio = this.form.get('municipio')?.value;
     const departamento = this.form.get('departamento')?.value;
-    if (!municipio || !this.mapaForm) return;
+    if (!direccion || !municipio) { this.mensajeUbicacion = 'Escribe la direccion y el municipio primero.'; return; }
     this.buscandoCoordenadas = true;
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(municipio + ', ' + departamento + ', Colombia')}&format=json&limit=1`;
+    this.mensajeUbicacion = 'Buscando...';
+    this.form.patchValue({ latitud: null, longitud: null });
+    const normalizada = this.normalizarDireccion(direccion);
+    const intentos = [
+      normalizada + ', ' + municipio + ', ' + departamento + ', Colombia',
+      normalizada + ', ' + municipio + ', Colombia',
+      direccion + ', ' + municipio + ', ' + departamento + ', Colombia',
+      direccion + ', ' + municipio + ', Colombia',
+      municipio + ', ' + departamento + ', Colombia'
+    ];
+    this.intentarBusqueda(intentos, 0, municipio);
+  }
+
+  private intentarBusqueda(intentos: string[], idx: number, mun: string): void {
+    if (idx >= intentos.length) {
+      this.buscandoCoordenadas = false;
+      this.mensajeUbicacion = 'No se encontro la direccion exacta.';
+      return;
+    }
+    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(intentos[idx]) + '&format=json&limit=1&countrycodes=co';
     this.http.get<any[]>(url).subscribe({
       next: (r) => {
-        this.buscandoCoordenadas = false;
         if (r && r.length > 0) {
-          this.mapaForm!.setView([parseFloat(r[0].lat), parseFloat(r[0].lon)], 14);
+          this.buscandoCoordenadas = false;
+          this.form.patchValue({ latitud: parseFloat(r[0].lat), longitud: parseFloat(r[0].lon) });
+          this.mensajeUbicacion = idx <= 1 ? 'Direccion encontrada' : idx <= 3 ? 'Ubicacion aproximada en ' + mun : 'Centro de ' + mun;
+        } else {
+          setTimeout(() => this.intentarBusqueda(intentos, idx + 1, mun), 1200);
         }
       },
-      error: () => { this.buscandoCoordenadas = false; }
+      error: () => { setTimeout(() => this.intentarBusqueda(intentos, idx + 1, mun), 1200); }
     });
+  }
+
+  private normalizarDireccion(dir: string): string {
+    return dir
+      .replace(/\bkra\b/gi, 'Carrera').replace(/\bcra\b/gi, 'Carrera').replace(/\bcr\b/gi, 'Carrera')
+      .replace(/\bcll\b/gi, 'Calle').replace(/\bcl\b/gi, 'Calle')
+      .replace(/\bav\b/gi, 'Avenida').replace(/\bdg\b/gi, 'Diagonal')
+      .replace(/\btv\b/gi, 'Transversal').replace(/\btr\b/gi, 'Transversal')
+      .replace(/#/g, '').replace(/\s+/g, ' ').trim();
   }
 
   cargar(): void {
@@ -125,11 +116,8 @@ export class MisParqueaderosComponent implements OnInit, AfterViewInit, OnDestro
     if (this.form.invalid) return;
     this.parqueaderoService.crear(this.form.value).subscribe({
       next: () => {
-        this.mensaje = '✅ Parqueadero creado. Pendiente de aprobación por el administrador.';
-        this.showForm = false;
-        this.destruirMapa();
-        this.form.reset();
-        this.cargar();
+        this.mensaje = 'Parqueadero creado. Pendiente de aprobacion.';
+        this.showForm = false; this.form.reset(); this.mensajeUbicacion = ''; this.cargar();
       },
       error: (err) => { this.mensaje = err.error?.message || 'Error al crear'; }
     });

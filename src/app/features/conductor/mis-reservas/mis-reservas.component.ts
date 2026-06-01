@@ -51,6 +51,14 @@ export class MisReservasComponent implements OnInit {
     });
   }
 
+  puedeCancel(r: ReservaResponse): boolean {
+    if (r.estado !== 'EN_CURSO') return false;
+    const inicio = new Date(r.fechaInicio);
+    const ahora = new Date();
+    const minutos = (ahora.getTime() - inicio.getTime()) / 60000;
+    return minutos <= 5;
+  }
+
   cancelar(id: string): void {
     if (!confirm('¿Estás seguro de cancelar esta reserva?')) return;
     this.reservaService.cancelar(id).subscribe({

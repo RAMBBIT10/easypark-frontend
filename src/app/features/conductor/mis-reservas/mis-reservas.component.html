@@ -48,7 +48,7 @@
         <button class="btn-confirm" *ngIf="r.estado === 'PENDIENTE_PAGO' && !r.conductorConfirmoPago" (click)="confirmarPago(r.id)">
           ✅ Confirmar que pagué
         </button>
-        <button class="btn-cancel" *ngIf="r.estado === 'EN_CURSO'" (click)="cancelar(r.id)">
+        <button class="btn-cancel" *ngIf="puedeCancel(r)" (click)="cancelar(r.id)">
           Cancelar
         </button>
       </div>
