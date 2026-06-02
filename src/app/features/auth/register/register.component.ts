@@ -44,7 +44,7 @@ export class RegisterComponent {
         this.loading = false;
         switch (response.rol) {
           case 'CONDUCTOR': this.router.navigate(['/conductor/parqueaderos']); break;
-          case 'DUENO':     this.router.navigate(['/dueno/mis-parqueaderos']); break;
+          case 'DUENO': this.router.navigate(['/dueno/mis-parqueaderos']); break;
         }
       },
       error: (err) => {
