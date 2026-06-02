@@ -22,6 +22,7 @@ export class ParqueaderoService {
     const params = motivo ? `?motivo=${encodeURIComponent(motivo)}` : '';
     return this.http.patch<ParqueaderoResponse>(`${this.apiUrl}/admin/${id}/rechazar${params}`, null);
   }
+  eliminar(id: string): Observable<void> { return this.http.delete<void>(`${this.apiUrl}/${id}`); }
 }
 
 @Injectable({ providedIn: 'root' })

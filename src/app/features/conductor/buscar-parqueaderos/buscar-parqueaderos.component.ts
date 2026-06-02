@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ParqueaderoService, ReservaService } from '../../../core/services/api.service';
 import { ParqueaderoResponse } from '../../../core/models/models';
@@ -35,8 +35,21 @@ export class BuscarParqueaderosComponent implements OnInit, AfterViewInit, OnDes
   ) {
     this.reservaForm = this.fb.group({
       placa: ['', [Validators.required, Validators.pattern(/^[A-Za-z]{3}[0-9A-Za-z]{3}$/)]],
-      fechaInicio: ['', Validators.required]
+      fechaInicio: ['', [Validators.required, this.noFechaFutura]]
     });
+  }
+
+  get fechaMaxima(): string {
+    const ahora = new Date();
+    ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+    return ahora.toISOString().slice(0, 16);
+  }
+
+  noFechaFutura(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    const seleccionada = new Date(control.value);
+    const ahora = new Date();
+    return seleccionada > ahora ? { fechaFutura: true } : null;
   }
 
   ngOnInit(): void { this.cargarParqueaderos(); }

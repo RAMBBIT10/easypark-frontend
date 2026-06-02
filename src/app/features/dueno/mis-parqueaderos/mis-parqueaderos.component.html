@@ -37,24 +37,19 @@
       </div>
       <div class="form-group">
         <label>Dirección *</label>
-        <input type="text" formControlName="direccion" placeholder="Calle 10 # 5-20">
-      </div>
-
-      <div class="mapa-form-section">
-        <div class="mapa-form-header">
-          <label>📍 Ubicación en el mapa</label>
-          <button type="button" class="btn-geo" (click)="centrarMapaEnMunicipio()" [disabled]="buscandoCoordenadas">
-            {{ buscandoCoordenadas ? 'Buscando...' : '🎯 Centrar en municipio' }}
+        <div class="direccion-row">
+          <input type="text" formControlName="direccion" placeholder="Calle 10 # 5-20">
+          <button type="button" class="btn-geo" (click)="buscarUbicacion()" [disabled]="buscandoCoordenadas">
+            {{ buscandoCoordenadas ? '🔍 Buscando...' : '📍 Buscar ubicación' }}
           </button>
         </div>
-        <p class="mapa-instruccion">Haz clic en el mapa para marcar la ubicación exacta de tu parqueadero</p>
-        <div id="mapa-form" class="mapa-form"></div>
-        <div class="coords-found" *ngIf="form.get('latitud')?.value">
-          ✅ Ubicación marcada: {{ form.get('latitud')?.value | number:'1.4-4' }}, {{ form.get('longitud')?.value | number:'1.4-4' }}
-        </div>
-        <div class="coords-missing" *ngIf="!form.get('latitud')?.value">
-          ⚠️ Haz clic en el mapa para marcar la ubicación
-        </div>
+      </div>
+
+      <div class="coords-found" *ngIf="mensajeUbicacion && form.get('latitud')?.value">
+        {{ mensajeUbicacion }}
+      </div>
+      <div class="coords-missing" *ngIf="mensajeUbicacion && !form.get('latitud')?.value">
+        {{ mensajeUbicacion }}
       </div>
 
       <div class="form-group">
@@ -86,6 +81,7 @@
           <span class="slider"></span>
         </label>
       </div>
+      <button class="btn-eliminar" (click)="eliminar(p)">🗑️ Eliminar parqueadero</button>
     </div>
   </div>
 </div>

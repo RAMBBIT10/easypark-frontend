@@ -63,7 +63,10 @@
         </div>
         <div class="form-group">
           <label>📅 Fecha y hora de inicio *</label>
-          <input type="datetime-local" formControlName="fechaInicio">
+          <input type="datetime-local" formControlName="fechaInicio" [max]="fechaMaxima">
+          <span class="error-msg" *ngIf="reservaForm.get('fechaInicio')?.errors?.['fechaFutura']">
+            La fecha de inicio no puede ser en el futuro
+          </span>
         </div>
         <div class="alert-success" *ngIf="mensaje">{{ mensaje }}</div>
         <div class="alert-error" *ngIf="error">{{ error }}</div>

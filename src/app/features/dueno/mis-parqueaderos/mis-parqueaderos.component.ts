@@ -123,6 +123,14 @@ export class MisParqueaderosComponent implements OnInit {
     });
   }
 
+  eliminar(p: ParqueaderoResponse): void {
+    if (!confirm('¿Estas seguro de eliminar "' + p.nombre + '"? Esta accion no se puede deshacer.')) return;
+    this.parqueaderoService.eliminar(p.id).subscribe({
+      next: () => { this.mensaje = 'Parqueadero eliminado correctamente.'; this.cargar(); },
+      error: (err) => { this.mensaje = err.error?.message || 'No se puede eliminar, tiene reservas activas.'; }
+    });
+  }
+
   toggleDisponibilidad(p: ParqueaderoResponse): void {
     this.parqueaderoService.actualizarDisponibilidad(p.id, !p.disponible).subscribe({
       next: () => this.cargar(),

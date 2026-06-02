@@ -8,6 +8,7 @@
 .direccion-row { display: flex; gap: 10px; input { flex: 1; } }
 .btn-geo { padding: 10px 14px; background: #16213e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; white-space: nowrap; &:disabled { opacity: 0.6; } }
 .coords-found { background: #e8f8f0; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #27ae60; margin-bottom: 16px; }
+.coords-missing { background: #fff8e1; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #f59f00; margin-bottom: 16px; }
 .btn-primary { padding: 12px 24px; background: #0f3460; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; &:disabled { opacity: 0.6; } }
 .loading, .empty { text-align: center; padding: 48px; color: #888; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
@@ -22,3 +23,4 @@
 .slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 24px; transition: 0.3s; &:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; } }
 input:checked + .slider { background: #27ae60; }
 input:checked + .slider:before { transform: translateX(20px); }
+.btn-eliminar { margin-top: 10px; width: 100%; padding: 8px; background: white; color: #e74c3c; border: 2px solid #e74c3c; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; &:hover { background: #ffeaea; } }
