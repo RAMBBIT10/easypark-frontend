@@ -46,10 +46,10 @@
       </div>
 
       <div class="coords-found" *ngIf="mensajeUbicacion && form.get('latitud')?.value">
-        {{ mensajeUbicacion }}
+        ✅ {{ mensajeUbicacion }}
       </div>
       <div class="coords-missing" *ngIf="mensajeUbicacion && !form.get('latitud')?.value">
-        {{ mensajeUbicacion }}
+        ⚠️ {{ mensajeUbicacion }}
       </div>
 
       <div class="form-group">

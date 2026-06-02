@@ -20,11 +20,11 @@
       <div class="reserva-info">
         <div class="info-item">
           <span class="label">Inicio</span>
-          <span>{{ r.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span>{{ r.fechaInicio | date:'dd/MM/yyyy HH:mm':'America/Bogota' }}</span>
         </div>
         <div class="info-item" *ngIf="r.fechaFin">
           <span class="label">Fin</span>
-          <span>{{ r.fechaFin | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span>{{ r.fechaFin | date:'dd/MM/yyyy HH:mm':'America/Bogota' }}</span>
         </div>
         <div class="info-item" *ngIf="r.totalAPagar">
           <span class="label">Total</span>

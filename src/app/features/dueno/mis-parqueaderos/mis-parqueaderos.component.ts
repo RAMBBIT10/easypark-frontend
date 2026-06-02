@@ -59,48 +59,56 @@ export class MisParqueaderosComponent implements OnInit {
     const direccion = this.form.get('direccion')?.value;
     const municipio = this.form.get('municipio')?.value;
     const departamento = this.form.get('departamento')?.value;
-    if (!direccion || !municipio) { this.mensajeUbicacion = 'Escribe la direccion y el municipio primero.'; return; }
+    if (!direccion || !municipio) {
+      this.mensajeUbicacion = 'Escribe la direccion y el municipio primero.';
+      return;
+    }
     this.buscandoCoordenadas = true;
-    this.mensajeUbicacion = 'Buscando...';
+    this.mensajeUbicacion = '';
     this.form.patchValue({ latitud: null, longitud: null });
-    const normalizada = this.normalizarDireccion(direccion);
+
+    const norm = this.normalizarDireccion(direccion);
     const intentos = [
-      normalizada + ', ' + municipio + ', ' + departamento + ', Colombia',
-      normalizada + ', ' + municipio + ', Colombia',
+      norm + ', ' + municipio + ', ' + departamento + ', Colombia',
+      norm + ', ' + municipio + ', Colombia',
       direccion + ', ' + municipio + ', ' + departamento + ', Colombia',
       direccion + ', ' + municipio + ', Colombia',
+      norm.split(' ').slice(0, 2).join(' ') + ', ' + municipio + ', Colombia',
       municipio + ', ' + departamento + ', Colombia'
     ];
     this.intentarBusqueda(intentos, 0, municipio);
   }
 
-  private intentarBusqueda(intentos: string[], idx: number, mun: string): void {
-    if (idx >= intentos.length) {
+  private intentarBusqueda(intentos: string[], index: number, municipio: string): void {
+    if (index >= intentos.length) {
       this.buscandoCoordenadas = false;
-      this.mensajeUbicacion = 'No se encontro la direccion exacta.';
+      this.mensajeUbicacion = 'No se encontro la ubicacion exacta.';
       return;
     }
-    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(intentos[idx]) + '&format=json&limit=1&countrycodes=co';
+    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(intentos[index]) + '&format=json&limit=1&countrycodes=co';
     this.http.get<any[]>(url).subscribe({
       next: (r) => {
         if (r && r.length > 0) {
           this.buscandoCoordenadas = false;
           this.form.patchValue({ latitud: parseFloat(r[0].lat), longitud: parseFloat(r[0].lon) });
-          this.mensajeUbicacion = idx <= 1 ? 'Direccion encontrada' : idx <= 3 ? 'Ubicacion aproximada en ' + mun : 'Centro de ' + mun;
+          const precision = index <= 1 ? 'exacta' : index <= 3 ? 'aproximada' : 'de la zona';
+          this.mensajeUbicacion = 'Ubicacion ' + precision + ' encontrada';
         } else {
-          setTimeout(() => this.intentarBusqueda(intentos, idx + 1, mun), 1200);
+          setTimeout(() => this.intentarBusqueda(intentos, index + 1, municipio), 800);
         }
       },
-      error: () => { setTimeout(() => this.intentarBusqueda(intentos, idx + 1, mun), 1200); }
+      error: () => { setTimeout(() => this.intentarBusqueda(intentos, index + 1, municipio), 800); }
     });
   }
 
   private normalizarDireccion(dir: string): string {
     return dir
-      .replace(/\bkra\b/gi, 'Carrera').replace(/\bcra\b/gi, 'Carrera').replace(/\bcr\b/gi, 'Carrera')
-      .replace(/\bcll\b/gi, 'Calle').replace(/\bcl\b/gi, 'Calle')
-      .replace(/\bav\b/gi, 'Avenida').replace(/\bdg\b/gi, 'Diagonal')
-      .replace(/\btv\b/gi, 'Transversal').replace(/\btr\b/gi, 'Transversal')
+      .toLowerCase()
+      .replace(/\bkra\b/g, 'Carrera').replace(/\bcra\b/g, 'Carrera').replace(/\bcr\b/g, 'Carrera')
+      .replace(/\bcll\b/g, 'Calle').replace(/\bcl\b/g, 'Calle')
+      .replace(/\bav\b/g, 'Avenida').replace(/\bave\b/g, 'Avenida')
+      .replace(/\bdg\b/g, 'Diagonal').replace(/\btv\b/g, 'Transversal')
+      .replace(/\btr\b/g, 'Transversal').replace(/\bcir\b/g, 'Circular')
       .replace(/#/g, '').replace(/\s+/g, ' ').trim();
   }
 
@@ -124,7 +132,7 @@ export class MisParqueaderosComponent implements OnInit {
   }
 
   eliminar(p: ParqueaderoResponse): void {
-    if (!confirm('¿Estas seguro de eliminar "' + p.nombre + '"? Esta accion no se puede deshacer.')) return;
+    if (!confirm('Estas seguro de eliminar "' + p.nombre + '"?')) return;
     this.parqueaderoService.eliminar(p.id).subscribe({
       next: () => { this.mensaje = 'Parqueadero eliminado correctamente.'; this.cargar(); },
       error: (err) => { this.mensaje = err.error?.message || 'No se puede eliminar, tiene reservas activas.'; }
