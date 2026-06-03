@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://easypark-final-production.up.railway.app'
+  apiUrl: 'https://easypark-gateway-kong-production.up.railway.app'
 };
