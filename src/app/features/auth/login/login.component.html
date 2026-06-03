@@ -8,7 +8,7 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>Correo electrónico</label>
-        <input type="email" formControlName="email" placeholder="correo@ejemplo.com"
+        <input type="email" formControlName="DEIGOVEGAVANEGAS" placeholder="correo@ejemplo.com"
                [class.error]="form.get('email')?.invalid && form.get('email')?.touched">
         <span class="error-msg" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
           Ingresa un correo válido
