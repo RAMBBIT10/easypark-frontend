@@ -2,13 +2,13 @@
   <div class="auth-card">
     <div class="auth-header">
       <div class="logo">🅿️</div>
-      <h1>Easy Park</h1>
-      <p>Inicia sesión en tu cuenta</p>
+      <h1>DEIGOALEJANDROVEGAVANEGAS</h1>
+      <p>DEIGOALEJANDROVEGAVANEGAS</p>
     </div>
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>Correo electrónico</label>
-        <input type="email" formControlName="DEIGOVEGAVANEGAS" placeholder="correo@ejemplo.com"
+        <input type="email" formControlName="email" placeholder="correo@ejemplo.com"
                [class.error]="form.get('email')?.invalid && form.get('email')?.touched">
         <span class="error-msg" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
           Ingresa un correo válido
