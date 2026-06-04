@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
 interface ParametroCatalogo {
@@ -58,7 +58,7 @@ export class CatalogosComponent implements OnInit {
 
   cargarParametros(): void {
     this.cargando = true;
-    this.http.get<ParametroCatalogo[]>(`${environment.apiUrl}/catalogos/parametros`, { headers: this.getHeaders() })
+    this.http.get<ParametroCatalogo[]>(`${environment.apiUrl}/catalogos/parametros`)
       .subscribe({
         next: (data) => { this.parametros = data; this.cargando = false; },
         error: () => { this.cargando = false; }
@@ -66,7 +66,7 @@ export class CatalogosComponent implements OnInit {
   }
 
   cargarMensajes(): void {
-    this.http.get<MensajeCatalogo[]>(`${environment.apiUrl}/catalogos/mensajes`, { headers: this.getHeaders() })
+    this.http.get<MensajeCatalogo[]>(`${environment.apiUrl}/catalogos/mensajes`)
       .subscribe({
         next: (data) => { this.mensajes = data; },
         error: () => {}
@@ -74,7 +74,7 @@ export class CatalogosComponent implements OnInit {
   }
 
   cargarNotificaciones(): void {
-    this.http.get<NotificacionCatalogo[]>(`${environment.apiUrl}/catalogos/notificaciones`, { headers: this.getHeaders() })
+    this.http.get<NotificacionCatalogo[]>(`${environment.apiUrl}/catalogos/notificaciones`)
       .subscribe({
         next: (data) => { this.notificaciones = data; },
         error: () => {}
