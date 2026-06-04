@@ -52,7 +52,7 @@ export class CatalogosComponent implements OnInit {
   }
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token') || '';
+    const token = localStorage.getItem('easypark_token') || '';
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
