@@ -66,6 +66,10 @@ export const routes: Routes = [
         path: 'reservas',
         loadComponent: () => import('./features/admin/todas-reservas/todas-reservas.component').then(m => m.TodasReservasComponent)
       },
+      {
+        path: 'catalogos',
+        loadComponent: () => import('./features/admin/catalogos/catalogos.component').then(m => m.CatalogosComponent)
+      },
       { path: '', redirectTo: 'pendientes', pathMatch: 'full' }
     ]
   },

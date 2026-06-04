@@ -1,0 +1,94 @@
+<div class="catalogos-container">
+  <h2>Catálogos del sistema</h2>
+
+  <div class="tabs">
+    <button [class.active]="tabActiva === 'parametros'" (click)="tabActiva = 'parametros'">Parámetros</button>
+    <button [class.active]="tabActiva === 'mensajes'" (click)="tabActiva = 'mensajes'">Mensajes</button>
+    <button [class.active]="tabActiva === 'notificaciones'" (click)="tabActiva = 'notificaciones'">Notificaciones</button>
+  </div>
+
+  <div class="tab-content">
+    <div *ngIf="tabActiva === 'parametros'">
+      <div class="tabla-header">
+        <h3>Catálogo de parámetros</h3>
+        <button class="btn-agregar" (click)="abrirFormulario('parametros')">+ Agregar</button>
+      </div>
+      <div *ngIf="cargando" class="loading">Cargando...</div>
+      <div *ngIf="!cargando && parametros.length === 0" class="empty">No hay parámetros registrados.</div>
+      <table *ngIf="!cargando && parametros.length > 0">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Valor</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of parametros">
+            <td>{{ p.clave }}</td>
+            <td>{{ p.valor }}</td>
+            <td>{{ p.descripcion }}</td>
+            <td><span [class]="p.activo ? 'badge-activo' : 'badge-inactivo'">{{ p.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="tabActiva === 'mensajes'">
+      <div class="tabla-header">
+        <h3>Catálogo de mensajes</h3>
+        <button class="btn-agregar" (click)="abrirFormulario('mensajes')">+ Agregar</button>
+      </div>
+      <div *ngIf="cargando" class="loading">Cargando...</div>
+      <div *ngIf="!cargando && mensajes.length === 0" class="empty">No hay mensajes registrados.</div>
+      <table *ngIf="!cargando && mensajes.length > 0">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Mensaje</th>
+            <th>Idioma</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of mensajes">
+            <td>{{ m.codigo }}</td>
+            <td>{{ m.mensaje }}</td>
+            <td>{{ m.idioma }}</td>
+            <td><span [class]="m.activo ? 'badge-activo' : 'badge-inactivo'">{{ m.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="tabActiva === 'notificaciones'">
+      <div class="tabla-header">
+        <h3>Catálogo de notificaciones</h3>
+        <button class="btn-agregar" (click)="abrirFormulario('notificaciones')">+ Agregar</button>
+      </div>
+      <div *ngIf="cargando" class="loading">Cargando...</div>
+      <div *ngIf="!cargando && notificaciones.length === 0" class="empty">No hay notificaciones registradas.</div>
+      <table *ngIf="!cargando && notificaciones.length > 0">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Título</th>
+            <th>Plantilla</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let n of notificaciones">
+            <td>{{ n.tipo }}</td>
+            <td>{{ n.titulo }}</td>
+            <td>{{ n.plantilla }}</td>
+            <td><span [class]="n.activo ? 'badge-activo' : 'badge-inactivo'">{{ n.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="mensaje" class="mensaje">{{ mensaje }}</div>
+</div>
