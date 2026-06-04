@@ -38,7 +38,6 @@ export class CatalogosComponent implements OnInit {
   tabActiva = 'parametros';
   cargando = false;
   mensaje = '';
-
   parametros: ParametroCatalogo[] = [];
   mensajes: MensajeCatalogo[] = [];
   notificaciones: NotificacionCatalogo[] = [];
@@ -49,11 +48,6 @@ export class CatalogosComponent implements OnInit {
     this.cargarParametros();
     this.cargarMensajes();
     this.cargarNotificaciones();
-  }
-
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('easypark_token') || '';
-    return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
   cargarParametros(): void {
@@ -82,7 +76,7 @@ export class CatalogosComponent implements OnInit {
   }
 
   abrirFormulario(tipo: string): void {
-    this.mensaje = `Para agregar registros al catÃ¡logo de ${tipo}, use el endpoint POST /catalogos/${tipo} desde Swagger.`;
+    this.mensaje = `Para agregar registros al catálogo de ${tipo}, use el endpoint POST /catalogos/${tipo} desde Swagger.`;
     setTimeout(() => { this.mensaje = ''; }, 4000);
   }
 }
